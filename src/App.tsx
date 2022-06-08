@@ -26,6 +26,12 @@ function App() {
   }, [data])
 
   useEffect(() => {
+    if (data.length >= fiveMinutesSession) {
+      localStorage.removeItem('@data')
+    }
+  }, [data.length])
+
+  useEffect(() => {
     let wsFactory = {
       tryCount: 3,
       connect: function (url: string | URL) {
@@ -42,13 +48,8 @@ function App() {
           };
           ws.onmessage = m => {
             const parsed = JSON.parse(m.data);
-            if (data.length < 20) {
-              setData((data: any) => [...data, ...parsed]);
-              setBoxData(parsed)
-              return;
-            }
-
-            setData([]);
+            setData((data: any) => [...data, ...parsed]);
+            setBoxData(parsed)
           };
           ws.onclose = ((e) => {
             toast.error('Disconnected');
